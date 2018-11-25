@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+	<meta charset='utf-8'/>
+	<title>lesson6_粒子效果</title>
+	<style>
+		*{  margin: 0; padding: 0;  }
+		.canvas{  border: 1px solid black; background: black;  }
+	</style>
+</head>
+<body>
+<canvas width='1500' height='800' class='canvas'>您的浏览器不支持canvas，请更换支持的浏览器</canvas>
+<script src="underscore.js"></script>
+<script>
+	var huaban = document.querySelector('.canvas');
+	var bicaso = huaban.getContext('2d');
+	var ballsArr = [];//小球数组
+
+	//小球类
+	function Ball(x, y){
+		this.x = x;
+		this.y = y;
+		this.r = _.random(5,50);
+		this.c = _.sample(['red','orange','yellow','pink','green','blue']);
+		//x,y的增减量
+		this.dx = _.random(-3,10);
+		this.dy = _.random(-3,10);
+		//
+		ballsArr.push(this);
+	} 
+	Ball.prototype.updata = function (){
+		this.x += this.dx;
+		this.y += this.dy;
+		this.r -= 0.5;
+		//如果当前小球半径小于0，则从数组中删除
+		if(this.r<=0){
+			_.without(ballsArr, this);
+		}
+	}
+	//画小球的方法
+	Ball.prototype.render = function (){
+		if(this.r<=0){
+			return;
+		}
+		bicaso.beginPath();
+		bicaso.arc(this.x, this.y, this.r, 0*Math.PI, 2*Math.PI);
+		bicaso.fillStyle = this.c;
+		bicaso.fill();
+		bicaso.closePath();
+	}
+
+
+	//通过移动事件触发，只要移动鼠标就创建小球
+	huaban.onmousemove = function (){
+		//创建小球
+		new Ball(event.offsetX+20, event.offsetY+2);
+	};
+
+	//动画开始，时间轴
+	//20 fps
+	setInterval(function (){
+		//1.清屏
+		bicaso.clearRect(0,0,1500,800);
+		//2.画上所有的小球
+		_.each(ballsArr, function (element){
+			//
+			element.updata();
+			//
+			element.render();
+		});
+	},50);
+
+</script>
+</body>
+</html> 
